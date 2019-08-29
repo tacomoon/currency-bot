@@ -1,0 +1,19 @@
+{
+  "name": "currency-bot",
+  "version": "1.0.0",
+  "description": "Pull, store and send currency report",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tacomoon/currency-bot.git"
+  },
+  "author": "tacommon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tacomoon/currency-bot/issues"
+  },
+  "homepage": "https://github.com/tacomoon/currency-bot#readme"
+}
