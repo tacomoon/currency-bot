@@ -1,11 +1,13 @@
 'use strict'
+
+require('./telegram')
 const cron = require('node-cron')
 const axios = require('axios')
 const express = require('express')
 const { currencies, save, convert, average } = require('./storage')
 
 const app = new express()
-const ratesToken = process.env.RATES_TOKEN
+const RATES_TOKEN = process.env.RATES_TOKEN
 
 cron.schedule('0 0 * * * *', () => requestRates(), {})
 
@@ -27,7 +29,7 @@ app.listen(3000, () => {
 })
 
 function requestRates() {
-  axios.get(`https://openexchangerates.org/api/latest.json?app_id=${ratesToken}`)
+  axios.get(`https://openexchangerates.org/api/latest.json?app_id=${RATES_TOKEN}`)
     .then((response) => {
       const body = response.data
       console.log('Received data:\n' + JSON.stringify(body))

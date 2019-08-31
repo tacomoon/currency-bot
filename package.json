@@ -4,6 +4,7 @@
   "description": "Pull, store and send currency report",
   "main": "src/index.js",
   "scripts": {
+    "start": "node src/index.js"
   },
   "repository": {
     "type": "git",
