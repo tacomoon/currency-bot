@@ -2,10 +2,6 @@
 
 const { currencies, cache } = require('../cache')
 
-function convert(from, to) {
-  return from.rate / to.rate
-}
-
 function average(currency) {
   const rates = cache.getRates(currency) || []
 
@@ -16,5 +12,5 @@ function average(currency) {
 }
 
 module.exports = {
-  currencies, convert, average
+  currencies, average
 }
