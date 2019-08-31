@@ -2,17 +2,15 @@
 
 const cron = require('node-cron')
 const axios = require('axios')
+const { cache } = require('../cache')
 
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN
-
-let offset = 0
-let subscribers = []
 
 cron.schedule('0 */1 * * * *', async () => {
   console.log('Scheduling pull messages')
 
   const updates = await getUpdates()
-    .filter(({ update_id }) => update_id > offset)
+    .filter(({ update_id }) => update_id > cache.getOffset())
 
   if (updates.length === 0) {
     return
@@ -21,16 +19,12 @@ cron.schedule('0 */1 * * * *', async () => {
   console.log(`Handling updates: ${JSON.stringify(updates)}`)
   updates.map(({ message, update_id }) => {
     handleMessage(message)
-    offset = update_id
+    cache.updateOffset(update_id)
   })
 }, {})
 
-function getSubscribers() {
-  return subscribers
-}
-
 function getUpdates() {
-  return axios.get(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/getUpdates?offset=${offset}`)
+  return axios.get(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/getUpdates?offset=${cache.getOffset()}`)
     .then(response => response.data.result)
 }
 
@@ -44,14 +38,14 @@ function handleMessage({ text, chat }) {
     case '/subscribe':
       console.log(`Handling subscribe command for chat ${chat.id}`)
 
-      subscribers.push(chat.id)
+      cache.saveSubscriber(chat.id)
       sendMessage(chat.id, 'Successfully subscribed')
       break
 
     case '/unsubscribe':
       console.log(`Handling unsubscribe command for chat ${chat.id}`)
 
-      subscribers.filter(sub => sub === chat.id)
+      cache.removeSubscriber(chat.id)
       sendMessage(chat.id, 'Successfully unsubscribed')
       break
 
@@ -62,5 +56,5 @@ function handleMessage({ text, chat }) {
 }
 
 module.exports = {
-  sendMessage, getSubscribers
+  sendMessage
 }

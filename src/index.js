@@ -1,8 +1,8 @@
 'use strict'
 
 const { cache } = require('./cache')
+const { sendMessage } = require('./telegram')
 const { currencies, average } = require('./rates')
-const { getSubscribers, sendMessage } = require('./telegram')
 
 const cron = require('node-cron')
 const axios = require('axios')
@@ -22,7 +22,7 @@ cron.schedule('0 0 * * * *', () => {
 cron.schedule('0 0 9 * * *', () => {
   console.log('Scheduling report')
 
-  getSubscribers()
+  cache.getSubscribers()
     .forEach(subscriber => sendMessage(subscriber, buildReport()))
 
 }, {})
