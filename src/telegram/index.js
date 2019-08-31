@@ -9,7 +9,7 @@ const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN
 cron.schedule('0 */1 * * * *', async () => {
   console.log('Scheduling pull messages')
 
-  const updates = await getUpdates()
+  const updates = (await getUpdates())
     .filter(({ update_id }) => update_id > cache.getOffset())
 
   if (updates.length === 0) {
@@ -26,14 +26,18 @@ cron.schedule('0 */1 * * * *', async () => {
 function getUpdates() {
   return axios.get(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/getUpdates?offset=${cache.getOffset()}`)
     .then(response => response.data.result)
+    .catch(() => [])
 }
 
 function sendMessage(chat, message) {
   axios.post(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${chat}&text=${message}`)
     .then(() => console.log(`Sent message to chat ${chat}:\n${message}`))
+    .catch(err => console.log(err))
 }
 
 function handleMessage({ text, chat }) {
+  console.log(`Handling command for chat ${chat.id}: ${text}`)
+
   switch (text) {
     case '/subscribe':
       console.log(`Handling subscribe command for chat ${chat.id}`)

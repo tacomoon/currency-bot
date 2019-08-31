@@ -10,6 +10,7 @@ const express = require('express')
 
 
 const app = new express()
+const PORT = process.env.PORT || 3000
 const RATES_TOKEN = process.env.RATES_TOKEN
 
 cron.schedule('0 0 * * * *', () => {
@@ -33,7 +34,7 @@ app.get('/', (request, response) => {
   response.send(report)
 })
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
   console.log('Listening on port 3000')
 
   requestRates()
@@ -47,7 +48,7 @@ function buildReport() {
     report[currency] = average(currency)
   }
 
-  return JSON.stringify(report)
+  return JSON.stringify(report, null, 2)
 }
 
 function requestRates() {
