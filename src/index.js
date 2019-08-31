@@ -1,7 +1,7 @@
 'use strict'
 
-const { store } = require('./store')
-const { currencies, convert, average } = require('./rates')
+const { cache } = require('./cache')
+const { currencies, average } = require('./rates')
 const { getSubscribers, sendMessage } = require('./telegram')
 
 const cron = require('node-cron')
@@ -19,8 +19,7 @@ cron.schedule('0 0 * * * *', () => {
   }, {}
 )
 
-// TODO [EG]: 9 am
-cron.schedule('0 0 17 * * *', () => {
+cron.schedule('0 0 9 * * *', () => {
   console.log('Scheduling report')
 
   getSubscribers()
@@ -62,7 +61,7 @@ function requestRates() {
         const currency = currencies[i]
         const rate = body.rates[currency]
 
-        store.saveRate(currency, rate, timestamp)
+        cache.saveRate(currency, rate, timestamp)
       }
     })
 }

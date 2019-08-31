@@ -18,9 +18,9 @@ function read(path) {
   }
 }
 
-class Store {
+class Cache {
   constructor() {
-    console.log('Creating store')
+    console.log('Creating cache')
     this.path = path.join(cacheRoot, 'state.json')
 
     if (!fs.existsSync(cacheRoot)) {
@@ -57,5 +57,5 @@ class Store {
 
 module.exports = {
   currencies,
-  store: new Store()
+  cache: new Cache()
 }
