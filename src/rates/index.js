@@ -1,6 +1,6 @@
 'use strict'
 
-const store = {}
+const store = require('../store')
 const currencies = ['USD', 'EUR', 'CZK', 'RUB']
 
 function convert(from, to) {
@@ -8,15 +8,18 @@ function convert(from, to) {
 }
 
 function save(currency, rate, timestamp) {
-  const rates = store[currency] || []
+  const rates = store.getState(`currencies.${currency}`) || []
   rates.push({ rate, timestamp })
 
-  store[currency] = rates
-    .filter(({ timestamp: ts }) => timestamp - ts <= 60 * 60 * 24)
+  store.saveState(
+    `currencies.${currency}`,
+    rates.filter(({ timestamp: ts }) => timestamp - ts <= 60 * 60 * 24)
+  )
 }
 
+// TODO [EG]: replace with min, max
 function average(currency) {
-  const rates = store[currency] || []
+  const rates = store.getState(`currencies.${currency}`) || []
 
   const sum = rates
     .map(rate => rate.rate)

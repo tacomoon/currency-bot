@@ -4,7 +4,7 @@ require('./telegram')
 const cron = require('node-cron')
 const axios = require('axios')
 const express = require('express')
-const { currencies, save, convert, average } = require('./storage')
+const { currencies, save, convert, average } = require('./rates')
 
 const app = new express()
 const RATES_TOKEN = process.env.RATES_TOKEN
