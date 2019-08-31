@@ -2,28 +2,29 @@
 
 const fs = require('fs')
 
+const currencies = ['USD', 'EUR', 'CZK', 'RUB']
+
 class Store {
   constructor(path) {
     console.log('Creating store')
     this.path = path
   }
 
-  getState(key) {
+  getRates(currency) {
     const state = require(this.path)
 
-    return key ? state[key] : state
+    return state['currencies'][currency]
   }
 
-  saveState(key, value) {
-    console.log(`Updating store, key: ${key}, value: ${value}`)
-
-    const state = this.getState()
-    state[key] = value
+  saveRate(currency, rate, timestamp) {
+    const state = require(this.path)
+    state['currencies'][currency].push({ rate, timestamp })
 
     fs.writeFile(this.path, JSON.stringify(state))
   }
 }
 
 module.exports = {
+  currencies,
   store: new Store('store/state.json')
 }

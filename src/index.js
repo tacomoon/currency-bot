@@ -1,25 +1,37 @@
 'use strict'
 
-require('./telegram')
+const { store } = require('./store')
+const { currencies, convert, average } = require('./rates')
+const { getSubscribers, sendMessage } = require('./telegram')
+
 const cron = require('node-cron')
 const axios = require('axios')
 const express = require('express')
-const { currencies, save, convert, average } = require('./rates')
+
 
 const app = new express()
 const RATES_TOKEN = process.env.RATES_TOKEN
 
-cron.schedule('0 0 * * * *', () => requestRates(), {})
+cron.schedule('0 0 * * * *', () => {
+    console.log('Scheduling rates update')
+
+    requestRates()
+  }, {}
+)
+
+// TODO [EG]: 9 am
+cron.schedule('0 0 17 * * *', () => {
+  console.log('Scheduling report')
+
+  getSubscribers()
+    .forEach(subscriber => sendMessage(subscriber, buildReport()))
+
+}, {})
 
 app.get('/', (request, response) => {
-  const result = {}
+  const report = buildReport()
 
-  for (let i = 0; i < currencies.length; i++) {
-    const currency = currencies[i]
-    result[currency] = average(currency)
-  }
-
-  response.send(JSON.stringify(result))
+  response.send(report)
 })
 
 app.listen(3000, () => {
@@ -27,6 +39,17 @@ app.listen(3000, () => {
 
   requestRates()
 })
+
+function buildReport() {
+  const report = {}
+
+  for (let i = 0; i < currencies.length; i++) {
+    const currency = currencies[i]
+    report[currency] = average(currency)
+  }
+
+  return JSON.stringify(report)
+}
 
 function requestRates() {
   axios.get(`https://openexchangerates.org/api/latest.json?app_id=${RATES_TOKEN}`)
@@ -39,7 +62,7 @@ function requestRates() {
         const currency = currencies[i]
         const rate = body.rates[currency]
 
-        save(currency, rate, timestamp)
+        store.saveRate(currency, rate, timestamp)
       }
     })
 }
