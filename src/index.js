@@ -1,17 +1,18 @@
 'use strict'
 
-const { cache } = require('./cache')
+const { cache, currencies, rub } = require('./cache')
 const { sendMessage } = require('./telegram')
-const { currencies, average } = require('./rates')
+const { findRate, latestRate, minimumRate, maximumRate } = require('./rates')
 
 const cron = require('node-cron')
 const axios = require('axios')
 const express = require('express')
 
 
-const app = new express()
 const PORT = process.env.PORT || 3000
 const RATES_TOKEN = process.env.RATES_TOKEN
+
+const app = new express()
 
 cron.schedule('0 0 * * * *', () => {
     console.log('Scheduling rates update')
@@ -24,12 +25,12 @@ cron.schedule('0 0 9 * * *', () => {
   console.log('Scheduling report')
 
   cache.getSubscribers()
-    .forEach(subscriber => sendMessage(subscriber, buildReport()))
+    .forEach(subscriber => sendMessage(subscriber, buildReport(rub)))
 
 }, {})
 
 app.get('/', (request, response) => {
-  const report = buildReport()
+  const report = buildReport(rub)
 
   response.send(report)
 })
@@ -39,17 +40,6 @@ app.listen(PORT, () => {
 
   requestRates()
 })
-
-function buildReport() {
-  const report = {}
-
-  for (let i = 0; i < currencies.length; i++) {
-    const currency = currencies[i]
-    report[currency] = average(currency)
-  }
-
-  return JSON.stringify(report, null, 2)
-}
 
 function requestRates() {
   axios.get(`https://openexchangerates.org/api/latest.json?app_id=${RATES_TOKEN}`)
@@ -65,4 +55,26 @@ function requestRates() {
         cache.saveRate(currency, rate, timestamp)
       }
     })
+}
+
+function buildReport(base) {
+  const report = {}
+
+  const curs = currencies.filter(({ currency }) => currency !== base)
+
+  for (let i = 0; i < curs.length; i++) {
+    const currency = curs[i]
+
+    const latest = latestRate(currency)
+    const minimum = minimumRate(currency)
+    const maximum = maximumRate(currency)
+
+    report[currency] = {
+      latest: latest.rate,
+      minimum: minimum.rate,
+      maximum: maximum.rate
+    }
+  }
+
+  return JSON.stringify(report, null, 2)
 }
