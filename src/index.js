@@ -60,19 +60,24 @@ function requestRates() {
 function buildReport(base) {
   const report = {}
 
-  const curs = currencies.filter(({ currency }) => currency !== base)
+  const curs = currencies.filter(currency => currency !== base)
 
   for (let i = 0; i < curs.length; i++) {
     const currency = curs[i]
 
     const latest = latestRate(currency)
+    const latestBase = findRate(base, latest.timestamp)
+
     const minimum = minimumRate(currency)
+    const minimumBase = findRate(base, minimum.timestamp)
+
     const maximum = maximumRate(currency)
+    const maximumBase = findRate(base, maximum.timestamp)
 
     report[currency] = {
-      latest: latest.rate,
-      minimum: minimum.rate,
-      maximum: maximum.rate
+      latest: latestBase.rate / latest.rate,
+      minimum: minimumBase.rate / minimum.rate,
+      maximum: maximumBase.rate / maximum.rate,
     }
   }
 
