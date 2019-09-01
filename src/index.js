@@ -81,5 +81,9 @@ function buildReport(base) {
     }
   }
 
-  return JSON.stringify(report, null, 2)
+  const latest = latestRate(base)
+  const date = new Date(latest.timestamp * 1000)
+  const rates = JSON.stringify(report, null, 2)
+
+  return `Report for ${date}\n${rates}`
 }
