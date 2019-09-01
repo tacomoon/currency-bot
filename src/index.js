@@ -75,9 +75,9 @@ function buildReport(base) {
     const maximumBase = findRate(base, maximum.timestamp)
 
     report[currency] = {
-      latest: latestBase.rate / latest.rate,
-      minimum: minimumBase.rate / minimum.rate,
-      maximum: maximumBase.rate / maximum.rate,
+      latest: Math.round(100 * latestBase.rate / latest.rate) / 100,
+      minimum: Math.round(100 * minimumBase.rate / minimum.rate) / 100,
+      maximum: Math.round(100 * maximumBase.rate / maximum.rate) / 100,
     }
   }
 
