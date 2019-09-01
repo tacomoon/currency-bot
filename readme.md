@@ -1,5 +1,6 @@
 ## Currencies rate bot
-Send daily ruble rate report in telegram at 9 AM.  
+Subscribe [to telegram bot](https://t.me/DailyCurrencyRatesBot) 
+to receive daily ruble rate report at 9 AM.
 
 Example:
 ```json
