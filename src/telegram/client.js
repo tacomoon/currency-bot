@@ -1,6 +1,7 @@
 'use strict'
 
 const axios = require('axios')
+const { cache } = require('../cache')
 const CLIENT_TOKEN = process.env.TELEGRAM_CLIENT_TOKEN | ''
 
 function getUpdates() {
