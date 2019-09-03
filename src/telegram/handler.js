@@ -3,10 +3,8 @@
 const { cache } = require('../cache')
 const { getUpdates, sendMessage } = require('./client')
 
-function pullMessages() {
-  console.log('Pulling messages from telegram')
-
-  const updates = getUpdates()
+async function pullMessages() {
+  const updates = (await getUpdates())
     .filter(update => update.update_id > cache.getOffset())
 
   if (updates.length === 0) return
