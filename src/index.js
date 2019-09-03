@@ -1,31 +1,30 @@
 'use strict'
 
-const { cache, currencies, rub } = require('./cache')
-const { pullMessages, sendMessage } = require('./telegram')
-const { pullRates, findRate, findLatestRate, findMinimumRate, findMaximumRate } = require('./rates')
-
 const cron = require('node-cron')
 const express = require('express')
-const PORT = process.env.PORT || 3000
+const { cache, RUB } = require('./cache')
+const { pullRates } = require('./rates')
+const { buildReport } = require('./report')
+const { pullMessages, sendMessage } = require('./telegram')
 
-const app = new express()
+const PORT = process.env.PORT || 3000
 
 // Pull currency rates every hour
 cron.schedule('0 0 * * * *', async () => pullRates(), {})
 // Pull messages from telegram every minute
 cron.schedule('0 */1 * * * *', async () => pullMessages(), {})
-
+// Build and send report at 9 AM every day
 cron.schedule('0 0 9 * * *', () => {
   console.log('Scheduling report')
 
   cache.getSubscribers()
-    .forEach(subscriber => sendMessage(subscriber, buildReport(rub)))
+    .forEach(subscriber => sendMessage(subscriber, buildReport(RUB)))
 
 }, {})
 
+const app = new express()
 app.get('/', (request, response) => {
-  const report = buildReport(rub)
-
+  const report = buildReport(RUB)
   response.send(report)
 })
 
@@ -34,34 +33,3 @@ app.listen(PORT, () => {
 
   pullRates()
 })
-
-function buildReport(base) {
-  const report = {}
-
-  const curs = currencies.filter(currency => currency !== base)
-
-  for (let i = 0; i < curs.length; i++) {
-    const currency = curs[i]
-
-    const latest = findLatestRate(currency)
-    const latestBase = findRate(base, latest.timestamp)
-
-    const minimum = findMinimumRate(currency)
-    const minimumBase = findRate(base, minimum.timestamp)
-
-    const maximum = findMaximumRate(currency)
-    const maximumBase = findRate(base, maximum.timestamp)
-
-    report[currency] = {
-      latest: Math.round(100 * latestBase.rate / latest.rate) / 100,
-      minimum: Math.round(100 * minimumBase.rate / minimum.rate) / 100,
-      maximum: Math.round(100 * maximumBase.rate / maximum.rate) / 100,
-    }
-  }
-
-  const latest = findLatestRate(base)
-  const date = new Date(latest.timestamp * 1000)
-  const rates = JSON.stringify(report, null, 2)
-
-  return `Report for ${date}\n${rates}`
-}
