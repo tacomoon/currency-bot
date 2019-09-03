@@ -1,7 +1,7 @@
 'use strict'
 
 const { cache, currencies, rub } = require('./cache')
-const { sendMessage } = require('./telegram')
+const { pullMessages, sendMessage } = require('./telegram')
 const { findRate, latestRate, minimumRate, maximumRate } = require('./rates')
 
 const cron = require('node-cron')
@@ -14,6 +14,9 @@ const RATES_TOKEN = process.env.RATES_TOKEN
 
 const app = new express()
 
+// Pull messages from telegram every minute
+cron.schedule('0 */1 * * * *', () => pullMessages(), {})
+// Pull currency rates every hour
 cron.schedule('0 0 * * * *', () => {
     console.log('Scheduling rates update')
 
