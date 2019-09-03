@@ -2,7 +2,7 @@
 
 const axios = require('axios')
 const { currencies, cache } = require('../cache')
-const CLIENT_TOKEN = process.env.EXCHANGE_CLIENT_TOKEN || ''
+const EXCHANGE_CLIENT_TOKEN = process.env.EXCHANGE_CLIENT_TOKEN || ''
 
 async function pullRates() {
   const { timestamp, rates } = await _getRates()
@@ -19,7 +19,7 @@ async function pullRates() {
 function _getRates() {
   console.log('Getting rates update')
 
-  return axios.get(`https://openexchangerates.org/api/latest.json?app_id=${CLIENT_TOKEN}`)
+  return axios.get(`https://openexchangerates.org/api/latest.json?app_id=${EXCHANGE_CLIENT_TOKEN}`)
     .then(response => {
       console.log(`Received rates: ${JSON.stringify(response.data)}`)
       return response.data
