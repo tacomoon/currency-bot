@@ -24,8 +24,8 @@ function _getRates() {
       console.log(`Received rates: ${JSON.stringify(response.data)}`)
       return response.data
     })
-    .catch((err) => {
-      console.log(err)
+    .catch(err => {
+      console.log(err.message)
       return {}
     })
 }

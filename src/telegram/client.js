@@ -9,8 +9,8 @@ function getUpdates() {
 
   return axios.get(`https://api.telegram.org/bot${CLIENT_TOKEN}/getUpdates?offset=${offset}`)
     .then(response => response.data.result)
-    .catch((err) => {
-      console.log(err)
+    .catch(err => {
+      console.log(err.message)
       return []
     })
 }
@@ -20,7 +20,7 @@ function sendMessage(chat, message) {
 
   axios.post(`https://api.telegram.org/bot${CLIENT_TOKEN}/sendMessage?chat_id=${chat}&text=${message}`)
     .then(() => console.log(`Sent message to chat ${chat}`))
-    .catch(err => console.log(err))
+    .catch(err => console.log(err.message))
 }
 
 module.exports = {
