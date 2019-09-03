@@ -3,12 +3,8 @@
 const fs = require('fs')
 const path = require('path')
 
-const usd = 'USD'
-const eur = 'EUR'
-const czk = 'CZK'
-const rub = 'RUB'
-
-const currencies = [usd, eur, czk, rub]
+const RUB = 'RUB'
+const currencies = ['USD', 'EUR', 'CZK', RUB]
 
 const cacheRoot = path.join(__dirname, '../../.cache')
 
@@ -110,6 +106,5 @@ class Cache {
 }
 
 module.exports = {
-  usd, eur, czk, rub, currencies,
-  cache: new Cache()
+  RUB, currencies, cache: new Cache()
 }
